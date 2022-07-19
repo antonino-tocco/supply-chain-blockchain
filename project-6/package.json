@@ -7,7 +7,7 @@
     "test": "test"
   },
   "scripts": {
-    "dev": "lite-server",
+    "dev": "webpack-dev-server",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -15,7 +15,11 @@
   "license": "MIT",
   "devDependencies": {
     "lite-server": "^2.6.1",
-    "mocha": "^6.2.3"
+    "mocha": "^6.2.3",
+    "copy-webpack-plugin": "^4.6.0",
+    "webpack": "^4.28.1",
+    "webpack-cli": "^3.2.1",
+    "webpack-dev-server": "^3.1.14"
   },
   "dependencies": {
     "truffle-hdwallet-provider": "^1.0.17",
