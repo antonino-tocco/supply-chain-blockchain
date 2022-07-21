@@ -6264,7 +6264,7 @@ module.exports = {
 (function (Buffer){
 'use strict';
 
-var BN = require('bn.js');
+var BN = require('../node_modules/bn.js/lib/bn');
 var numberToBN = require('number-to-bn');
 var keccak256 = require('js-sha3').keccak_256;
 
@@ -7257,7 +7257,7 @@ module.exports = function isHexPrefixed(str) {
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"_process":13}],12:[function(require,module,exports){
-var BN = require('bn.js');
+var BN = require('../node_modules/bn.js/lib/bn');
 var stripHexPrefix = require('strip-hex-prefix');
 
 /**

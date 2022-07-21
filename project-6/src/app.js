@@ -1,4 +1,6 @@
 import Web3 from "web3";
+import TruffleContract from "@truffle/contract";
+
 
 const App = {
     web3Provider: null,
@@ -85,7 +87,7 @@ const App = {
     },
 
     getMetaskAccountID: function () {
-        web3 = new Web3(App.web3Provider);
+        let web3 = new Web3(App.web3Provider);
 
         // Retrieving accounts
         web3.eth.getAccounts(function(err, res) {
@@ -101,12 +103,12 @@ const App = {
 
     initSupplyChain: function () {
         /// Source the truffle compiled smart contracts
-        var jsonSupplyChain='../../build/contracts/SupplyChain.json';
+        var jsonSupplyChain='./contracts/SupplyChain.json';
         
         /// JSONfy the smart contracts
         $.getJSON(jsonSupplyChain, function(data) {
             console.log('data',data);
-            var SupplyChainArtifact = data;
+            const SupplyChainArtifact = data;
             App.contracts.SupplyChain = TruffleContract(SupplyChainArtifact);
             App.contracts.SupplyChain.setProvider(App.web3Provider);
             
