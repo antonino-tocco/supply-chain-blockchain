@@ -91,7 +91,7 @@ contract SupplyChain is Ownable, ConsumerRole, DistributorRole, FarmerRole, Reta
         _;
         uint _price = items[_upc].productPrice;
         uint amountToReturn = msg.value - _price;
-        items[_upc].consumerID.transfer(amountToReturn);
+        msg.sender.transfer(amountToReturn);
     }
 
     // Define a modifier that checks if an item.state of a upc is Harvested
@@ -183,12 +183,14 @@ contract SupplyChain is Ownable, ConsumerRole, DistributorRole, FarmerRole, Reta
         // Increment sku
         items[_upc] = item;
         sku = sku + 1;
+        // Add farmers
+        addFarmer(_originFarmerID);
         // Emit the appropriate event
         emit Harvested(_upc);
     }
 
     // Define a function 'processtItem' that allows a farmer to mark an item 'Processed'
-    function processItem(uint _upc) public onlyFarmer verifyCaller(items[_upc].ownerID) harvested(_upc)
+    function processItem(uint _upc) public onlyFarmer verifyCaller(_owner) harvested(_upc)
         // Call modifier to check if upc has passed previous supply chain stage
 
         // Call modifier to verify caller of this function
@@ -201,7 +203,7 @@ contract SupplyChain is Ownable, ConsumerRole, DistributorRole, FarmerRole, Reta
     }
 
     // Define a function 'packItem' that allows a farmer to mark an item 'Packed'
-    function packItem(uint _upc) public onlyFarmer verifyCaller(items[_upc].ownerID) processed(_upc)
+    function packItem(uint _upc) public onlyFarmer verifyCaller(_owner) processed(_upc)
         // Call modifier to check if upc has passed previous supply chain stage
 
         // Call modifier to verify caller of this function
@@ -214,7 +216,7 @@ contract SupplyChain is Ownable, ConsumerRole, DistributorRole, FarmerRole, Reta
     }
 
     // Define a function 'sellItem' that allows a farmer to mark an item 'ForSale'
-    function sellItem(uint _upc, uint _price) public onlyFarmer verifyCaller(items[_upc].ownerID) packed(_upc)
+    function sellItem(uint _upc, uint _price) public onlyFarmer verifyCaller(_owner) packed(_upc)
         // Call modifier to check if upc has passed previous supply chain stage
 
         // Call modifier to verify caller of this function
@@ -230,7 +232,7 @@ contract SupplyChain is Ownable, ConsumerRole, DistributorRole, FarmerRole, Reta
     // Define a function 'buyItem' that allows the disributor to mark an item 'Sold'
     // Use the above defined modifiers to check if the item is available for sale, if the buyer has paid enough,
     // and any excess ether sent is refunded back to the buyer
-    function buyItem(uint _upc) public payable onlyDistributor forSale(_upc) paidEnough(items[_upc].productPrice) checkValue(_upc)
+    function buyItem(uint _upc) public payable onlyDistributor forSale(_upc) checkValue(_upc)
         // Call modifier to check if upc has passed previous supply chain stage
 
         // Call modifer to check if buyer has paid enough
@@ -244,10 +246,9 @@ contract SupplyChain is Ownable, ConsumerRole, DistributorRole, FarmerRole, Reta
         items[_upc].distributorID = msg.sender;
         items[_upc].itemState = State.Sold;
         // Transfer money to farmer
-        items[_upc].originFarmerID.transfer(items[_upc].productPrice);
-        // Add distributor and transfer ownership
+        items[_upc].originFarmerID.transfer(msg.value);
+        // Add distributor
         addDistributor(msg.sender);
-        transferOwnership(msg.sender);
 
         // emit the appropriate event
         emit Sold(_upc);
@@ -255,7 +256,7 @@ contract SupplyChain is Ownable, ConsumerRole, DistributorRole, FarmerRole, Reta
 
     // Define a function 'shipItem' that allows the distributor to mark an item 'Shipped'
     // Use the above modifers to check if the item is sold
-    function shipItem(uint _upc) public onlyDistributor verifyCaller(items[_upc].ownerID) purchased(_upc)
+    function shipItem(uint _upc) public onlyDistributor verifyCaller(_owner) purchased(_upc)
         // Call modifier to check if upc has passed previous supply chain stage
 
         // Call modifier to verify caller of this function
@@ -278,6 +279,8 @@ contract SupplyChain is Ownable, ConsumerRole, DistributorRole, FarmerRole, Reta
         items[_upc].ownerID = msg.sender;
         items[_upc].retailerID = msg.sender;
         items[_upc].itemState = State.Received;
+        //Add retailer
+        addRetailer(msg.sender);
         // Emit the appropriate event
         emit Received(_upc);
     }
@@ -293,6 +296,8 @@ contract SupplyChain is Ownable, ConsumerRole, DistributorRole, FarmerRole, Reta
         items[_upc].ownerID = msg.sender;
         items[_upc].consumerID = msg.sender;
         items[_upc].itemState = State.Purchased;
+        //Add consumer
+        addConsumer(msg.sender);
         // Emit the appropriate event
         emit Purchased(_upc);
     }
